@@ -1,0 +1,264 @@
+#popup {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  z-index: 100;
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+#popup.visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.panel {
+  transform: translateY(-40px);
+  opacity: 0;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.panel.visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+@keyframes giro-salto {
+  0%   { transform: scale(1) rotate(0deg) ; }
+  25%  { transform: scale(1.1) rotate(-15deg);  }
+  50%  { transform: scale(0.95) rotate(15deg);  }
+  75%  { transform: scale(1.05) rotate(-10deg);  }
+  100% { transform: scale(1) rotate(0deg); }  
+}
+
+#jjrobotica.animar {
+  animation: giro-salto 1s ease-in-out;
+}
+
+#popup .panel {
+   background: linear-gradient(to bottom, #2e2e2e, #1b1b1b); /* fondo panel tipo metálico */
+  border: 1px solid #555;
+  padding: 5px 40px;
+  border-radius: 12px;
+  box-shadow: inset 0 1px 0 white, 0 0 15px #000; /* reborde blanco arriba */
+  width: 60%;
+  text-align: center;
+  margin-top: 1%;
+}
+.sliderWrapper {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    margin: 1% 20%;
+    flex-direction: row;
+}
+.slider-panel {
+    background: #0d0d0d;
+    border-radius: 8px;
+    padding: 5px;
+    margin: 10px;
+} 
+
+#popup .panel h2 {
+  color: #ddd;
+  font-size: 18px;
+  margin-bottom: 10px;
+  text-shadow: 0 1px 2px black;
+}
+
+   input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 80%;
+      height: 10px;
+      background: #333;
+      border-radius: 5px;
+      outline: none;
+      margin-bottom: 20px;
+    }
+
+   input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 30px;
+        height: 30px;
+        background: url('img/metal_knob.png') no-repeat center;
+        background-size: cover;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+
+    input[type=range]::-moz-range-thumb {
+      width: 30px;
+      height: 30px;
+      background: url('img/metal_knob.png') no-repeat center;
+      background-size: cover;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+ /*  #popup button {
+    margin-top: 20px;
+    background: #3c3c3c;
+    color: #969696;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    width: auto;
+    font-weight: bold;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  #popup button:hover {
+      background: #0d0d0d;
+      border: 1px solid #555;
+      padding: 5px 12px;
+    
+    } */
+
+  #popup .btn-metal {
+  width: 40px;
+  height: 20px;
+  border: none;
+  background: url('img/flecha.png') no-repeat center;
+  background-size: contain;
+  padding-top: 10px;
+  cursor: pointer;
+  /* transform: translateY(8px); */
+}
+.btn_izq {
+  transform: rotate(180deg) scaleY(-1);
+}
+
+.btn-curva{
+  width: 60px !important;
+  height: 60px !important;
+  border: none;
+  background: url('img/curva.png') no-repeat center;
+  background-size: contain;
+  padding-top: 10px;
+  cursor: pointer;
+}
+.btn-giro{
+  width: 60px !important;
+  height: 60px !important;
+  border: none;
+  background: url('img/giro.png') no-repeat center;
+  background-size: cover;
+  padding-top: 10px;
+  cursor: pointer;
+}
+.active-curva{
+  background: url('img/curva_pres.png') no-repeat center;
+  background-size: cover;
+}
+.active-giro{
+  background: url('img/giro_pres.png') no-repeat center;
+  background-size: cover;
+}
+  #popup label {
+  display: block;
+  margin: 15px 0px; /* separa el label del input */
+  color: #dfdfdf;
+}
+.giro-label {
+  display: flex;
+  flex-direction: column;
+}  
+   /*resto*/ 
+    
+    html, body {
+      background-image: radial-gradient(#333333 4px, transparent 4px), radial-gradient(#333333 4px, transparent 4px);
+      background-size: 32px 32px;
+      background-position: 0 0, 16px 16px;
+      background-color: #0f0f0f;
+      margin: 0; padding: 0;
+      font-family: sans-serif;
+      overflow: hidden;
+      width: 100vw; height: 100vh;
+      display: flex; justify-content: center; align-items: center;
+    }
+    #rotate-warning {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #000000d9; color: white; z-index: 10;
+      justify-content: center; align-items: center;
+      text-align: center; font-size: 2rem; padding: 2rem;
+    }
+    .landscape { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
+    .layout { display: flex; flex-direction: column; gap: 20px; }
+    .row { display: flex; justify-content: space-around; align-items: center; }
+    .top-row { width: 100vw; }
+    .bottom-row { width: 66vw; }
+    .btn-img {
+      width: 100px; height: 100px;
+      background-size: cover; background-position: center; background-repeat: no-repeat;
+      background-color: transparent; border: none; padding: 0; margin: 0;
+      cursor: pointer; touch-action: none; user-select: none;
+      -webkit-user-drag: none; -webkit-tap-highlight-color: transparent;
+      appearance: none; -webkit-appearance: none;
+    }
+    .btn-img:focus, .btn-img:active { outline: none !important; box-shadow: none !important; border: none !important; }
+    #status {
+      position: absolute; bottom: 10px; right: 15px;
+      font-family: monospace; font-size: 1rem; color: green;
+    }
+.contenedor-logo {
+  position: absolute;
+  top: 25vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 80px;
+}
+
+#jjrobotica {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  background-image: url('img/logo_blanco.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  /* animation: giro-salto 1s ease-in-out 30; */
+  transform-origin: center center;
+}
+    @keyframes pulse {
+  0% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-50%) scale(1.05); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+.pulso {
+  animation: pulse 4s ease-in-out;
+}
+
+#titulo {
+  position: absolute;
+  top: 10vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30vw;
+  height: 10vh;
+  max-width: 300px;
+  max-height: 60px;
+  background-image: url('img/jjrobotica.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 10;
+  cursor: pointer;
+}
+    @media (orientation: portrait) {
+      .landscape { display: none; }
+      #rotate-warning { display: flex; }
+    }

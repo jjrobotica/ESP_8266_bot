@@ -1,0 +1,436 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Control Autito</title>
+  <link rel="stylesheet" href="estilo.css">
+  <link rel="preload" href="img/metal_knob.png" as="image">
+</head>
+<body >
+  <div id="titulo" class="btn-img"></div>
+  <div id="rotate-warning">🔁 Por favor girá tu dispositivo a horizontal para controlar el robot</div>
+  <div class="landscape layout">
+    <div class="row top-row">
+      <button id="F" class="btn-img" style="background-image: url('img/arriba.png');" aria-label="Arriba"></button>
+      <button id="R" class="btn-img" style="background-image: url('img/der.png');" aria-label="Derecha"></button>
+    </div>
+    <div class="row bottom-row">
+      <button id="B" class="btn-img" style="background-image: url('img/abajo.png');" aria-label="Abajo"></button>
+      <button id="L" class="btn-img" style="background-image: url('img/izq.png');" aria-label="Izquierda"></button>
+    </div>
+  </div>
+  <div id="status">🟠 Conectando...</div>
+  <div class="contenedor-logo">
+    <div id="jjrobotica" class="btn-img" onclick="abrirPopup()"></div>
+  </div>
+    <!-- <div style="background: white;">
+      <p>Actual: <div id="comandoDebug" ></div></p>
+      <p>Anterior: <div id="comandoLast" ></div></p>
+    </div> -->
+  </div>
+
+  <div id="popup">
+    <div class="panel">
+      <h2>Ajuste de giros</h2>
+      <div class="slider-panel">
+        <div class="sliderWrapper">
+          <button style="gap: 100px;" data-comando="CI" class="giro-curva btn-curva btn_izq btn-img" onclick="toggle(this)"></button>
+    <div class="giro-label">
+          <label for="curvaSlider">Giro en curva</label>
+        <span id="valorCurva" style="color: #ccc; margin-top: -10px;">50 %</span>
+    </div>  
+          <button data-comando="CD" class="giro-curva btn-curva btn-img" onclick="toggle(this)"></button>
+        </div>
+        <div class="sliderWrapper" style="gap: 10px;">
+          <button class="btn-metal btn_izq btn-img"
+          onmousedown="mantenerPresionado('curvaSlider', -1, event)"
+          onmouseup="detenerPresionado()"
+          ontouchstart="mantenerPresionado('curvaSlider', -1, event)"
+          ontouchend="detenerPresionado()"></button>        
+          <input type="range" id="curvaSlider" min="0" max="100" value="50" />
+          <button class="btn-metal btn-img"
+          onmousedown="mantenerPresionado('curvaSlider', 1, event)"
+            onmouseup="detenerPresionado()"
+            ontouchstart="mantenerPresionado('curvaSlider', 1, event)"
+            ontouchend="detenerPresionado()" 
+          ></button>
+        </div>
+      <hr style="border-block-color: #000; margin: 15px 50px;">
+      
+        <div class="sliderWrapper" style="gap: 10px;">    
+          <button class="btn-metal btn_izq btn-img" 
+          onmousedown="mantenerPresionado('giroSlider', -1, event)"
+          onmouseup="detenerPresionado()"
+          ontouchstart="mantenerPresionado('giroSlider', -1, event)"
+          ontouchend="detenerPresionado()"
+          ></button>
+          <input type="range" id="giroSlider" min="0" max="100" value="50" />
+          <button class="btn-metal btn-img"
+            onmousedown="mantenerPresionado('giroSlider', 1, event)"
+          onmouseup="detenerPresionado()"
+          ontouchstart="mantenerPresionado('giroSlider', 1, event)"
+          ontouchend="detenerPresionado()"></button>
+        </div>
+        
+        <div class="sliderWrapper">
+          <button data-comando="GI" class="giro-curva btn_izq btn-giro btn-img" onclick="toggle(this)"></button>
+          <div class="giro-label">
+            <span id="valorGiro" style="color: #ccc; margin-bottom: -10px;">50 %</span>
+          <label for="giroSlider">Giro en el lugar</label>
+    </div>
+          <button data-comando="GD" class="giro-curva btn-giro btn-img" onclick="toggle(this)"></button>
+        </div>
+    </div>
+     <!-- <p>Actual: <div id="comandoDebug" ></div></p>
+    <p>Anterior: <div id="comandoLast" ></div></p> -->
+      <button onclick="cerrarPopup()">Cerrar</button>
+    </div>
+  </div>
+  <!-- <div id="popup" onclick="cerrarPopup()" style="position:absolute;top:0;left:0;width:100%;height:100%;background:#000a;z-index:9999;">
+    <div style="position:absolute;top:50px;left:50%;transform:translateX(-50%);background:#fff;padding:20px;border-radius:10px;">
+      <h3 style="color:black">¡Popup funcionando!</h3>
+    </div>
+  </div> -->
+  
+</div>
+
+
+
+<script>
+/* document.addEventListener("mouseup", detenerPresionado);
+document.addEventListener("touchend", detenerPresionado); */
+document.getElementById("popup").addEventListener("touchend", function(e) {
+  if (e.target.closest('.btn-metal')) {
+    detenerPresionado();
+  }
+});
+  //anim titulo 
+  const titulo = document.getElementById("titulo");
+
+  setInterval(() => {
+    titulo.classList.add("pulso");
+
+    setTimeout(() => {
+      titulo.classList.remove("pulso");
+    }, 4000); // duración exacta de la animación pulse
+  }, 20000); // se repite cada 20 segundos
+
+  titulo.addEventListener("click", () => {
+  //window.location.href = "https://jjrobotica.com.ar";
+  //window.open("https://jjrobotica.com.ar", "_blank");
+  if (window.AppInventor) {
+    window.AppInventor.setWebViewString("web");
+  }
+});
+//animacion
+let animacionesRealizadas = 0;
+const maxAnimaciones = 3;
+
+function animarJJRobotica() {
+  if (animacionesRealizadas >= maxAnimaciones) return;
+
+  const icono = document.getElementById("jjrobotica");
+  icono.classList.add("animar");
+
+  setTimeout(() => {
+    icono.classList.remove("animar");
+  }, 1000); // dura 1s igual que el animation
+
+  animacionesRealizadas++;
+}
+
+setTimeout(() => {
+  animarJJRobotica(); // primera vez
+  let intervalo = setInterval(() => {
+    animarJJRobotica();
+    if (animacionesRealizadas >= maxAnimaciones) {
+      clearInterval(intervalo);
+    }
+  }, 10000); // cada 10 segundos
+}, 5000); // leve delay tras carga
+
+//ajustes
+let intervalo = null;
+let comando = "S";
+let ultimoComando = "";
+let ultimoEnvioMs = 0;
+
+function mantenerPresionado(sliderId, delta, event) {
+  if (event) {
+    event.stopPropagation();
+
+    if (event.type === "touchstart") {
+      event.preventDefault(); // Previene el click posterior
+    }
+  }
+
+  ajustar(sliderId, delta); // primer ajuste
+  intervalo = setInterval(() => ajustar(sliderId, delta), 150);
+}
+
+function detenerPresionado() {
+  clearInterval(intervalo);
+  setTimeout(() => {
+    presionado = false; // Permite ajustar nuevamente al soltar
+  }, 150); // Espera un poco antes de permitir otro ajuste
+}
+
+function clickFino(sliderId, delta) {
+  if(!presionado){ajustar(sliderId, delta)}; // Solo ajusta si no está presionado
+  presionado = false; // Resetea el estado de presionado
+  clearInterval(intervalo); // Asegura que no haya intervalos activos
+  //console.log('finoli');
+}
+//cambio de valor del slider
+document.getElementById("curvaSlider").addEventListener("input", function() {
+  const valor = this.value;
+  document.getElementById("valorCurva").textContent = valor+" %";
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    socket.send("PWM_curva," + valor);
+  }
+});
+document.getElementById("giroSlider").addEventListener("input", function() {
+  const valor = this.value;
+  document.getElementById("valorGiro").textContent = valor+" %";
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    socket.send("PWM_giro," + valor);
+  }
+});
+
+
+function toggle(el) {
+  const isActive = el.classList.contains("active");
+
+  // Quita la clase active de todos los botones
+  document.querySelectorAll('.giro-curva').forEach(btn => {
+    btn.classList.remove('active');
+    btn.classList.remove('active-curva');
+    btn.classList.remove('active-giro');
+  });
+
+  if (!isActive) {
+    el.classList.add('active');
+    comando = el.dataset.comando; // ✅ Aquí se actualiza correctamente el comando
+
+    if (el.classList.contains('btn-curva')) {
+      el.classList.add('active-curva');
+    } else if (el.classList.contains('btn-giro')) {
+      el.classList.add('active-giro');
+    }
+  } else {
+    comando = "S";
+  }
+}
+
+function abrirPopup() {
+  //document.getElementById("popup").style.display = "flex";
+  const popup = document.getElementById("popup");
+  const panel = popup.querySelector(".panel");
+
+  // Mostrar el fondo
+  popup.classList.add("visible");
+  // Restaurar y enviar PWM guardado
+  const curva = localStorage.getItem("pwmCurva");
+  const giro = localStorage.getItem("pwmGiro");
+
+  if (curva) {
+    document.getElementById("curvaSlider").value = curva;
+    document.getElementById("valorCurva").textContent = curva + " %";
+  }
+
+  if (giro) {
+    document.getElementById("giroSlider").value = giro;
+    document.getElementById("valorGiro").textContent = giro + " %";
+  }
+    // Pequeño timeout para permitir que la animación se aplique
+  setTimeout(() => {
+    panel.classList.add("visible");
+  }, 10);
+}
+  
+function cerrarPopup() {
+  const popup = document.getElementById("popup");
+  const panel = popup.querySelector(".panel");
+
+  // Ocultar el panel con animación
+  panel.classList.remove("visible");
+
+  // Luego de que termine la animación, ocultar el fondo
+  setTimeout(() => {
+    popup.classList.remove("visible");
+  }, 300);
+
+  document.querySelectorAll('.giro-curva').forEach(btn => {
+    btn.classList.remove('active', 'active-curva', 'active-giro');
+  });
+
+  comando = "S";
+
+  // Guardar PWM en localStorage
+  localStorage.setItem("pwmCurva", document.getElementById("curvaSlider").value);
+  localStorage.setItem("pwmGiro", document.getElementById("giroSlider").value);
+}
+
+function ajustar(id, cambio) {
+    const slider = document.getElementById(id);
+    const nuevoValor = parseInt(slider.value) + cambio;
+
+    // Asegurarse de no salirse de rango
+    if (nuevoValor >= parseInt(slider.min) && nuevoValor <= parseInt(slider.max)) {
+      slider.value = nuevoValor;
+
+      // Si tenés un evento que maneja cambios (como para enviar por WebSocket), podés dispararlo manualmente:
+      slider.dispatchEvent(new Event('input'));
+    }
+  }
+
+    const buttons = ["F", "B", "L", "R"];
+    const activeButtons = new Set();
+    const buttonElements = {};
+    const imageSources = {
+      F: { normal: "img/arriba.png", pressed: "img/arriba_pres.png" },
+      B: { normal: "img/abajo.png", pressed: "img/abajo_pres.png" },
+      L: { normal: "img/izq.png", pressed: "img/izq_pres.png" },
+      R: { normal: "img/der.png", pressed: "img/der_pres.png" }
+    };
+
+    let socket;
+    const statusDiv = document.getElementById("status");
+
+    function conectarWS() {
+      socket = new WebSocket("ws://192.168.4.1/ws");
+
+      socket.onopen = () => {
+        console.log("🟢 WebSocket conectado");
+        statusDiv.textContent = "🟢 Conectado";
+        statusDiv.style.color = "lime";
+        // Fuerza a reenviar el estado actual (normalmente "S") apenas conecta
+        ultimoComando = "";
+        
+        const curva = localStorage.getItem("pwmCurva");
+        const giro = localStorage.getItem("pwmGiro");
+
+        if (curva) socket.send(`PWM_curva,${curva}`);
+        if (giro) socket.send(`PWM_giro,${giro}`);
+      };
+
+      socket.onclose = () => {
+        console.log("🔴 WebSocket desconectado");
+        statusDiv.textContent = "🔴 Desconectado";
+        statusDiv.style.color = "red";
+        setTimeout(conectarWS, 1000);
+      };
+
+      socket.onerror = (e) => {
+        console.error("⚠️ Error en WebSocket:", e);
+      };
+    }
+
+    conectarWS();
+
+    Object.values(imageSources).forEach(img => {
+      new Image().src = img.normal;
+      new Image().src = img.pressed;
+    });
+
+    buttons.forEach(id => {
+      const el = document.getElementById(id);
+      buttonElements[id] = el;
+
+      const activar = () => {
+        el.style.backgroundImage = `url('${imageSources[id].pressed}')`;
+        activeButtons.add(id);
+      };
+
+      const desactivar = () => {
+        el.style.backgroundImage = `url('${imageSources[id].normal}')`;
+        activeButtons.delete(id);
+      };
+
+      el.addEventListener("mousedown", activar);
+      el.addEventListener("mouseup", desactivar);
+      el.addEventListener("mouseleave", desactivar);
+      el.addEventListener("touchstart", activar);
+      el.addEventListener("touchend", desactivar);
+    });
+
+    function pointInElement(x, y, el) {
+      const rect = el.getBoundingClientRect();
+      return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+    }
+
+    document.addEventListener("touchmove", e => {
+      activeButtons.clear();
+      for (const touch of e.touches) {
+        buttons.forEach(id => {
+          const el = buttonElements[id];
+          if (pointInElement(touch.clientX, touch.clientY, el)) {
+            activeButtons.add(id);
+            el.style.backgroundImage = `url('${imageSources[id].pressed}')`;
+          }
+        });
+      }
+
+      buttons.forEach(id => {
+        if (!activeButtons.has(id)) {
+          buttonElements[id].style.backgroundImage = `url('${imageSources[id].normal}')`;
+        }
+      });
+    });
+
+    document.addEventListener("touchend", e => {
+      activeButtons.clear();
+      for (const touch of e.touches) {
+        buttons.forEach(id => {
+          const el = buttonElements[id];
+          if (pointInElement(touch.clientX, touch.clientY, el)) {
+            activeButtons.add(id);
+            el.style.backgroundImage = `url('${imageSources[id].pressed}')`;
+          }
+        });
+      }
+
+      buttons.forEach(id => {
+        const el = buttonElements[id];
+        if (!activeButtons.has(id)) {
+          el.style.backgroundImage = `url('${imageSources[id].normal}')`;
+        }
+      });
+    });
+
+    
+setInterval(() => {
+  const keys = Array.from(activeButtons).sort();
+  let combo = keys.join(",");
+  const validCombos = ["F", "B", "L", "R", "F,L", "F,R", "B,L", "B,R"];
+  
+  // Si hay un botón de giro o curva activo, combo se reemplaza con comando
+  if (document.querySelector('.giro-curva.active')) {
+    combo = comando;
+  } else {
+    combo = validCombos.includes(combo) ? combo : "S";
+  }
+  // Envía al cambiar y, además, cada 200 ms como latido:
+  // si el ESP deja de recibir mensajes por 600 ms, frena solo (failsafe).
+  const ahora = Date.now();
+  const cambio = combo !== ultimoComando;
+  if (cambio || ahora - ultimoEnvioMs >= 200) {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(combo);
+      ultimoEnvioMs = ahora;
+    }
+    if (cambio) console.log("Enviado:", combo);
+    ultimoComando = combo;
+  }
+}, 10);
+document.getElementById("popup").addEventListener("click", function (event) {
+  const panel = document.querySelector("#popup .panel");
+  if (!panel.contains(event.target)) {
+    cerrarPopup();
+  }
+});
+  </script>
+</body>
+</html>
